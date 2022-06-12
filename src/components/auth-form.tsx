@@ -4,12 +4,15 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { auth } from "../lib/mutations";
 import Logo from "./logo";
+import NextLink from "next/link";
 
 interface AuthFormProps {
   mode: "signin" | "signup";
 }
 
 const AuthForm = ({ mode }: AuthFormProps) => {
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +23,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
     e.preventDefault();
     setIsLoading(true);
 
-    await auth(mode, { email, password }).then((res) => {
+    await auth(mode, { firstname, lastname, email, password }).then((res) => {
       if (res.error) {
         setError(res.error);
       }
@@ -40,12 +43,24 @@ const AuthForm = ({ mode }: AuthFormProps) => {
         <Logo />
       </Flex>
       <Flex justify="center" align="center" height="calc(100vh - 100px)">
-        <Box padding="50px" bg="gray.900" borderRadius="6px">
+        <Box padding="50px" bg="gray.900" borderRadius="6px" width={400}>
           <form onSubmit={handleSubmit}>
-            {error && (
-              <small style={{ fontWeight: "bold" }}>
-                {error}
-              </small>
+            {error && <small style={{ fontWeight: "bold" }}>{error}</small>}
+            {mode === "signup" && (
+              <>
+                <Input
+                  placeholder="John"
+                  type="text"
+                  onChange={(e) => setFirstname(e.target.value)}
+                  marginTop={3}
+                />
+                <Input
+                  placeholder="Doe"
+                  type="text"
+                  onChange={(e) => setLastname(e.target.value)}
+                  marginTop={3}
+                />
+              </>
             )}
             <Input
               placeholder="johndoe@mail.com"
@@ -73,6 +88,11 @@ const AuthForm = ({ mode }: AuthFormProps) => {
             >
               {mode.charAt(0).toUpperCase() + mode.slice(1)}
             </Button>
+            {mode === "signin" ? (
+              <NextLink href="signup">Signup</NextLink>
+            ) : (
+              <NextLink href="signin">Signin</NextLink>
+            )}
           </form>
         </Box>
       </Flex>

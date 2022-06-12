@@ -7,7 +7,15 @@ import prisma from "../../lib/prisma";
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     const salt = bcrypt.genSaltSync();
-    const { email, password } = req.body;
+    const { firstname, lastname, email, password } = req.body;
+
+    if (!firstname) {
+      res.status(400).json({ error: "Firstname is required" });
+    }
+
+    if (!lastname) {
+      res.status(400).json({ error: "Lastname is required" });
+    }
 
     if (!email) {
       res.status(400).json({ error: "Email is required" });
@@ -24,8 +32,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         data: {
           email,
           password: bcrypt.hashSync(password, salt),
-          firstName: "",
-          lastName: "",
+          firstName: firstname,
+          lastName: lastname
         }
       });
     } catch (error) {
